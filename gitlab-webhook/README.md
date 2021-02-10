@@ -1,21 +1,25 @@
 # gitlab-webhook
+This sam application is used to make CI/CD possible with Gitlab. Gitlab does not offer integration.
+But, Gitlab supports webhooks.
+Whenever some code is pushed to a specific branch. A lambda function is triggered which eventually triggers Codebuild.
+That's how with the help of this sam app, we can achieve complete pipeline.
 
-This project contains source code and supporting files for a serverless application that you can deploy with the SAM CLI. It includes the following files and folders.
 
-- hello_world - Code for the application's Lambda function.
-- events - Invocation events that you can use to invoke the function.
-- tests - Unit tests for the application code. 
-- template.yaml - A template that defines the application's AWS resources.
+## Prerequisite
 
-The application uses several AWS resources, including Lambda functions and an API Gateway API. These resources are defined in the `template.yaml` file in this project. You can update the template to add AWS resources through the same deployment process that updates your application code.
+AWS SAM CLI
+To use the SAM CLI, you need the following tools.
 
-If you prefer to use an integrated development environment (IDE) to build and test your application, you can use the AWS Toolkit.  
-The AWS Toolkit is an open source plug-in for popular IDEs that uses the SAM CLI to build and deploy serverless applications on AWS. The AWS Toolkit also adds a simplified step-through debugging experience for Lambda function code. See the following links to get started.
+* SAM CLI - [Install the SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
+* [Python 3 installed](https://www.python.org/downloads/)
+* Docker - [Install Docker community edition](https://hub.docker.com/search/?type=edition&offering=community)
 
-* [PyCharm](https://docs.aws.amazon.com/toolkit-for-jetbrains/latest/userguide/welcome.html)
-* [IntelliJ](https://docs.aws.amazon.com/toolkit-for-jetbrains/latest/userguide/welcome.html)
-* [VS Code](https://docs.aws.amazon.com/toolkit-for-vscode/latest/userguide/welcome.html)
-* [Visual Studio](https://docs.aws.amazon.com/toolkit-for-visual-studio/latest/user-guide/welcome.html)
+To build and deploy your application for the first time, run the following in your shell:
+
+```bash
+sam build --use-container
+sam deploy --guided
+```
 
 ## Deploy the sample application
 
@@ -33,15 +37,6 @@ To build and deploy your application for the first time, run the following in yo
 sam build --use-container
 sam deploy --guided
 ```
-
-The first command will build the source of your application. The second command will package and deploy your application to AWS, with a series of prompts:
-
-* **Stack Name**: The name of the stack to deploy to CloudFormation. This should be unique to your account and region, and a good starting point would be something matching your project name.
-* **AWS Region**: The AWS region you want to deploy your app to.
-* **Confirm changes before deploy**: If set to yes, any change sets will be shown to you before execution for manual review. If set to no, the AWS SAM CLI will automatically deploy application changes.
-* **Allow SAM CLI IAM role creation**: Many AWS SAM templates, including this example, create AWS IAM roles required for the AWS Lambda function(s) included to access AWS services. By default, these are scoped down to minimum required permissions. To deploy an AWS CloudFormation stack which creates or modified IAM roles, the `CAPABILITY_IAM` value for `capabilities` must be provided. If permission isn't provided through this prompt, to deploy this example you must explicitly pass `--capabilities CAPABILITY_IAM` to the `sam deploy` command.
-* **Save arguments to samconfig.toml**: If set to yes, your choices will be saved to a configuration file inside the project, so that in the future you can just re-run `sam deploy` without parameters to deploy changes to your application.
-
 You can find your API Gateway Endpoint URL in the output values displayed after deployment.
 
 ## Use the SAM CLI to build and test locally
@@ -57,6 +52,7 @@ The SAM CLI installs dependencies defined in `hello_world/requirements.txt`, cre
 Test a single function by invoking it directly with a test event. An event is a JSON document that represents the input that the function receives from the event source. Test events are included in the `events` folder in this project.
 
 Run functions locally and invoke them with the `sam local invoke` command.
+To run for specific event (api request): `sam local invoke GitlabWebhook --event events/event.json`
 
 ```bash
 gitlab-webhook$ sam local invoke HelloWorldFunction --event events/event.json
@@ -95,18 +91,6 @@ gitlab-webhook$ sam logs -n HelloWorldFunction --stack-name gitlab-webhook --tai
 
 You can find more information and examples about filtering Lambda function logs in the [SAM CLI Documentation](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-logging.html).
 
-## Tests
-
-Tests are defined in the `tests` folder in this project. Use PIP to install the test dependencies and run tests.
-
-```bash
-gitlab-webhook$ pip install -r tests/requirements.txt --user
-# unit test
-gitlab-webhook$ python -m pytest tests/unit -v
-# integration test, requiring deploying the stack first.
-# Create the env variable AWS_SAM_STACK_NAME with the name of the stack we are testing
-gitlab-webhook$ AWS_SAM_STACK_NAME=<stack-name> python -m pytest tests/integration -v
-```
 
 ## Cleanup
 
