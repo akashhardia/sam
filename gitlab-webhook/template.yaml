@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  gitlab-webhook
+
+  Lambda function for starting code build for gitlab code pushes
+
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  GitlabWebhook:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: gitlab_webhook/
+      Handler: app.handler
+      Runtime: python3.6
+      Events:
+        GitlabWebhook:
+          Type: Api
+          Properties:
+            Path: /gitlab_webhook
+            Method: post
+      Environment:
+        Variables:
+          GitPullCodeBuild: betdefi-production-backend-webhook
+          Branch_Name: production
+          ECR_BASE_URI: ecr-uri
+
+Outputs:
+  GitlabWebhookApi:
+    Description: "API Gateway endpoint URL for Prod stage for GitlabWebhook function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/webhook/"
+  GitlabWebhookFunction:
+    Description: "GitlabWebhook Lambda Function ARN"
+    Value: !GetAtt GitlabWebhook.Arn
+  GitlabWebhookFunctionIamRole:
+    Description: "Implicit IAM Role created for GitlabWebhook function"
+    Value: !GetAtt GitlabWebhookRole.Arn
